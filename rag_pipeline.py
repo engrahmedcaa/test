@@ -19,9 +19,9 @@ DOCUMENT_FILE = "icao_doc_9157_aerodromedesignmanual.pdf"
 PERSIST_DIRECTORY = "./aerodrome_vector_db"
 
 # LLM for FINAL ANSWER GENERATION (Google Gemini API)
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.6-flash"   # gemini-2.5-flash was retired for new users on 2026-07-21
 GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
-GEMINI_TEMPERATURE = 0.3           # lower = more literal/grounded, less "creative"
+GEMINI_TEMPERATURE = 0.3            # lower = more literal/grounded, less "creative"
 LLM_MAX_TOKENS = 500
 
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
