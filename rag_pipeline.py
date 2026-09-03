@@ -1,7 +1,7 @@
-# rag_pipeline.py (xAI GROK CLIENT, OPENAI-COMPATIBLE, CLOUD COMPATIBLE)
+# rag_pipeline.py (Google Gemini CLIENT, OPENAI-COMPATIBLE, CLOUD COMPATIBLE)
 import os
 import time
-from openai import OpenAI  # xAI's API is OpenAI-compatible, so we reuse the openai SDK
+from openai import OpenAI  # Gemini provides OpenAI-compatible API access
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import SentenceTransformerEmbeddings
@@ -18,10 +18,10 @@ load_dotenv()
 DOCUMENT_FILE = "icao_doc_9157_aerodromedesignmanual.pdf"
 PERSIST_DIRECTORY = "./aerodrome_vector_db"
 
-# LLM for FINAL ANSWER GENERATION (xAI Grok API)
-XAI_MODEL = "grok-4-fast"          # fast + cheap, plenty for grounded RAG QA
-XAI_BASE_URL = "https://api.x.ai/v1"
-XAI_TEMPERATURE = 0.3              # lower = more literal/grounded, less "creative"
+# LLM for FINAL ANSWER GENERATION (Google Gemini API)
+GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
+GEMINI_TEMPERATURE = 0.3           # lower = more literal/grounded, less "creative"
 LLM_MAX_TOKENS = 500
 
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
@@ -33,20 +33,20 @@ RERANK_TOP_K = 4
 USE_RERANKING = True  # False is fastest!
 
 # ---------------- API KEY SETUP ----------------
-# !!! CRITICAL FOR PUBLIC HOSTING: Relying ONLY on environment variable XAI_API_KEY !!!
+# !!! CRITICAL FOR PUBLIC HOSTING: Rely ONLY on GEMINI_API_KEY environment variable !!!
 # NEVER hardcode a real key in this file. Locally it comes from .env (see .env.example).
-# On Streamlit Cloud it comes from st.secrets, bridged into os.environ by app.py.
+# On Streamlit Cloud it should come from st.secrets, bridged into os.environ by app.py.
 # ---------------------------------------------------
 
 # ---------------- GLOBAL PRELOADED MODELS ----------------
-print("Initializing xAI (Grok) Client (one-time)...")
+print("Initializing Google Gemini Client (one-time)...")
 try:
-    _api_key = os.getenv("XAI_API_KEY")
+    _api_key = os.getenv("GEMINI_API_KEY")
     if not _api_key:
-        raise ValueError("XAI_API_KEY environment variable is not set.")
-    GLOBAL_LLM = OpenAI(api_key=_api_key, base_url=XAI_BASE_URL)
+        raise ValueError("GEMINI_API_KEY environment variable is not set.")
+    GLOBAL_LLM = OpenAI(api_key=_api_key, base_url=GEMINI_BASE_URL)
 except Exception as e:
-    print(f"Error initializing xAI client. Check XAI_API_KEY: {e}")
+    print(f"Error initializing Gemini client. Check GEMINI_API_KEY: {e}")
     GLOBAL_LLM = None
 
 ### OPTIMIZATION: Load CrossEncoder reranker ONCE
@@ -132,10 +132,10 @@ def rerank_results(query, retrieved_docs, top_k=RERANK_TOP_K):
     return [doc for score, doc in ranked[:top_k]]
 
 
-# ---------------- 5. LLM answer (xAI Grok) ----------------
+# ---------------- 5. LLM answer (Google Gemini) ----------------
 def generate_answer(query, reranked_docs):
     if GLOBAL_LLM is None:
-        raise ConnectionError("xAI client failed to initialize. Please check the XAI_API_KEY secret.")
+        raise ConnectionError("Gemini client failed to initialize. Please check the GEMINI_API_KEY secret.")
 
     context = "\n\n---\n\n".join([doc.page_content for doc in reranked_docs])
 
@@ -177,8 +177,8 @@ def answer_question(query, vectordb):
 
 # ---------------- 7. CLI interactive ----------------
 if __name__ == "__main__":
-    if not os.getenv("XAI_API_KEY"):
-        print("!!! WARNING: XAI_API_KEY environment variable is not set. API calls may fail !!!")
+    if not os.getenv("GEMINI_API_KEY"):
+        print("!!! WARNING: GEMINI_API_KEY environment variable is not set. API calls may fail !!!")
 
     if GLOBAL_LLM is None:
         exit(1)

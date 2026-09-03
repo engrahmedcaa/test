@@ -1,13 +1,13 @@
-# app.py - Streamlit Chatbot Interface (xAI Grok-powered, cloud robust)
+# app.py - Streamlit Chatbot Interface (Google Gemini-powered, cloud robust)
 import os
 import time
 import streamlit as st
 
 # --- 0. BRIDGE STREAMLIT SECRETS -> ENV VAR (must happen BEFORE importing rag_pipeline,
-#     since rag_pipeline reads os.getenv("XAI_API_KEY") at import time) ---
+#     since rag_pipeline reads os.getenv("GEMINI_API_KEY") at import time) ---
 try:
-    if "XAI_API_KEY" in st.secrets:
-        os.environ.setdefault("XAI_API_KEY", st.secrets["XAI_API_KEY"])
+    if "GEMINI_API_KEY" in st.secrets:
+        os.environ.setdefault("GEMINI_API_KEY", st.secrets["GEMINI_API_KEY"])
 except Exception:
     # st.secrets raises if no secrets.toml exists at all (e.g. pure local run using .env) — that's fine.
     pass
@@ -28,7 +28,7 @@ def setup_rag_bot():
         st.error(f"Error: Required file not found. Ensure '{DOCUMENT_FILE}' is in your GitHub repository.")
         st.stop()
     except ConnectionError as e:
-        st.error(f"Initialization Failed: {e}. Please check your XAI_API_KEY secret.")
+        st.error(f"Initialization Failed: {e}. Please check your GEMINI_API_KEY secret.")
         st.stop()
     except Exception as e:
         st.error(f"An unexpected error occurred during RAG component loading: {e}")
@@ -38,11 +38,11 @@ def setup_rag_bot():
 # --- 2. STREAMLIT UI SETUP ---
 
 st.set_page_config(
-    page_title="Aerodrome Design Manual Chatbot (Grok-RAG)",
+    page_title="Aerodrome Design Manual Chatbot (Gemini-RAG)",
     layout="centered"
 )
-st.title("✈️ Aerodrome Design Manual RAG Chatbot (Grok-Powered)")
-st.caption("🚀 Ask questions about ICAO Doc 9157 — Aerodrome Design Manual. Responses powered by xAI's Grok, running with Sentence Transformers and Reranking.")
+st.title("✈️ Aerodrome Design Manual RAG Chatbot (Gemini-Powered)")
+st.caption("🚀 Ask questions about ICAO Doc 9157 — Aerodrome Design Manual. Responses powered by Google Gemini 2.5 Flash, running with Sentence Transformers and Reranking.")
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
@@ -85,7 +85,7 @@ if prompt := st.chat_input("Ask a question about the Aerodrome Design Manual..."
 
             message_placeholder.markdown(full_response)
 
-            st.caption(f"Time: {end_time - start_time:.2f}s | Model: Grok (grok-4-fast) | RAG Parameters: k=10, Rerank=4")
+            st.caption(f"Time: {end_time - start_time:.2f}s | Model: Google Gemini (gemini-2.5-flash) | RAG Parameters: k=10, Rerank=4")
 
         except Exception as e:
             error_msg = f"An error occurred while fetching the answer: {e}"
