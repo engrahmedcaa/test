@@ -1,0 +1,20 @@
+# Secrets - NEVER commit these
+.env
+.streamlit/secrets.toml
+
+# Vector DB (regenerated automatically on first run)
+aerodrome_vector_db/
+ncsp_vector_db/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+env/
+*.egg-info/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
