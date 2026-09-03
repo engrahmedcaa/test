@@ -7,3 +7,4 @@ langchain-chroma
 sentence-transformers
 python-dotenv
 pypdf
+cryptography
