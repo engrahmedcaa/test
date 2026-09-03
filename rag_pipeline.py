@@ -148,9 +148,9 @@ def generate_answer(query, reranked_docs):
     ]
 
     completion = GLOBAL_LLM.chat.completions.create(
-        model=XAI_MODEL,
+        model=GEMINI_MODEL,
         messages=messages,
-        temperature=XAI_TEMPERATURE,
+        temperature=GEMINI_TEMPERATURE,
         max_tokens=LLM_MAX_TOKENS,
         stream=False
     )
